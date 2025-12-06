@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Тут написано, как называется вкладка в браузере</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <h1>Технологические зависимости!</h1>
+    <div class="frame">
+    Технологические зависимости — это когда человек не может обходиться без технологий.
+</div>
+    <p>Это такой вид зависимости, когда человек не может обойтись без использования определенных
+технологий и устройств.
+Эта зависимость может привести к тому, что человек потеряет способность функционировать без
+этих технологий совсем... Что может сказаться на уровне его жизни.</p>
+    <h2  class="frame2">Вот самые распространенные технологические зависимости</h2>
+             <ul class="frame1">
+                   <li>Социальные сети и мессенджеры: социальные сети уменьшают время, которое мы проводим в реальном мире. А еще привыкаем к постоянному обновлению новостей и сообщений.</li>
+
+                   <li>Смартфоны и планшеты: смартфоны и планшеты могут стать привычным способом общения с миром, и люди могут стать зависимыми от постоянной проверки уведомлений!</li>
+                   <li>Игры и онлайн-развлечения: игры и онлайн-развлечения могут стать зависимостью, особенно в случаях, когда люди проводят слишком много времени в виртуальном мире вместо реальной жизни.</li>
+                   <li>Интернет-шопинг и онлайн-покупки: люди могут стать зависимыми от онлайн-шопинга, особенно если они используют его для удовлетворения эмоциональных потребностей.</li>
+
+             </ul>
+     <img class="frame3" src="https://avatars.mds.yandex.net/i?id=320558eb81d1d8fd73d9eea6f24a1fd3114a8afd-5275128-images-thumbs&n=13">
+<iframe src="https://www.meteoblue.com/en/weather/widget/daily/almaty_kazakhstan_1526384?geoloc=fixed&days=7&tempunit=CELSIUS&windunit=KILOMETER_PER_HOUR&precipunit=MILLIMETER&coloured=coloured&pictoicon=1&maxtemperature=1&mintemperature=1&windspeed=1&windgust=0&winddirection=1&uv=0&humidity=0&precipitation=1&precipitationprobability=1&spot=1&pressure=1&layout=light&user_key=5afd62c875683f9f&embed_key=8d20018b01779f90&sig=0aa68d3ab1af1502ecdbcd5e873f95e326d5117128421eb1c27315faf5e0adaa" frameborder="0" scrolling="NO" allowtransparency="true" sandbox="allow-same-origin allow-scripts allow-popups allow-popups-to-escape-sandbox" style="width: 378px;height: 371px;border: 0;overflow: hidden;"></iframe><div><!-- DO NOT REMOVE THIS LINK --><a href="https://www.meteoblue.com/en/weather/week/index" target="_blank" rel="noopener">meteoblue</a></div>
+
+
+
+
+</body>
+</html>
