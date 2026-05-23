@@ -1,0 +1,225 @@
+import sounddevice as sd
+import numpy as np
+import scipy.io.wavfile as wav
+import speech_recognition as sr
+from googletrans import Translator
+import random
+import telebot
+from telebot import types
+from PIL import Image, ImageOps
+import random , os
+import pymorphy3
+import nltk
+import inspect
+from nltk.corpus import stopwords
+from nltk.tokenize import sent_tokenize, word_tokenize
+from nltk.probability import FreqDist
+from wordcloud import WordCloud
+from matplotlib import pyplot as plt
+
+from logic import getargspec
+inspect.getargspec = getargspec
+nltk.download('punkt')
+nltk.download('punkt_tab')
+nltk.download('stopwords')
+a = "en"
+b = 10
+TOKEN = "8333984025:AAFe0QbFReUfJUuvX2cDY7g7vcgqK1Oc7Gs"
+bot = telebot.TeleBot(TOKEN)
+
+last_text = ""
+
+@bot.message_handler(commands=['start'])
+def send_welcome(message):
+    bot.reply_to(message, "Привет я бот который может модернизировать твое аудио для списка команд -- /help")
+
+
+
+@bot.message_handler(commands=['help'])
+def send_help(message):
+    bot.reply_to(message, "/help --Список команд /translate --Перевод твоего аудио /short --Сокращение твоего аудио /show --Показывает последний текст аудио /listen --Начать запись /language --Выбрать язык для перевода /len --Выбрать длину записи в секундах")
+
+
+@bot.message_handler(commands=['listen'])
+def send_listen(message):
+    global last_text,b
+    duration = b  # секунды записи
+    sample_rate = 44100
+    bot.reply_to(message, "Говори...")
+
+
+    recording = sd.rec(
+        int(duration * sample_rate), # длительность записи в сэмплах
+        samplerate=sample_rate,      # частота дискретизации
+        channels=1,                  # 1 — это моно
+        dtype="int16")               # формат аудиоданных
+    sd.wait()  # ждём завершения записи
+
+
+    wav.write("output.wav", sample_rate, recording)
+    bot.reply_to(message, "Запись завершена, теперь распознаём...")
+
+
+    recognizer = sr.Recognizer()
+    with sr.AudioFile("output.wav") as source:
+            audio = recognizer.record(source)
+
+
+    try:
+        text = recognizer.recognize_google(audio, language="ru-RU")
+        last_text = text
+        bot.reply_to(message, f"Распознано:\n{last_text}")
+        bot.reply_to(message, "Отлично теперь пиши команду что хочешь сделать со своим текстом!")
+
+    except sr.UnknownValueError:
+        bot.reply_to(message, "Не удалось распознать речь.")
+    except sr.RequestError as e:
+        bot.reply_to(message, f"Ошибка сервиса: {e}")
+
+
+
+@bot.message_handler(commands=['short'])
+def send_s(message):
+    global last_text, a,b
+    if last_text:
+
+        
+        sentences = sent_tokenize(last_text, language='russian')
+
+        
+
+        stop_words = set(stopwords.words('russian'))
+
+        words = word_tokenize(last_text)
+        words = [word.lower() for word in words if word.isalpha()]
+        words = [word for word in words if word not in stop_words]
+
+        morph = pymorphy3.MorphAnalyzer()
+        words = [morph.parse(word)[0].normal_form for word in words]
+
+        freq_dist = FreqDist(words)
+        sentence_scores = {}
+
+        for i, sentence in enumerate(sentences):
+            sentence_words = word_tokenize(sentence.lower())
+            morph = pymorphy3.MorphAnalyzer()
+            sentence_words = [morph.parse(word)[0].normal_form for word in sentence_words]
+            sentence_score = sum([freq_dist[word] for word in sentence_words if word in freq_dist])
+
+            sentence_scores[i] = sentence_score
+
+        sorted_scores = sorted(sentence_scores.items(), key=lambda x: x[1], reverse=True)
+
+        selected_sentences = sorted_scores[:1]
+        selected_sentences = sorted(selected_sentences)
+
+        # Формируем суммаризацию
+        summary = ' '.join([sentences[i] for i, _ in selected_sentences])
+
+    
+     
+        bot.reply_to(message, summary)
+
+    else:
+        bot.reply_to(message, "Вы еще не записали аудио! для записи /listen")
+
+
+@bot.message_handler(commands=['translate'])
+def send_translate(message):
+    if last_text:
+        translator = Translator()
+        translated = translator.translate(last_text, dest= a)  # здесь 'en' — это английский
+        
+        if a == "es":
+            bot.reply_to(message ,"🌍 Перевод на Испанский:")
+            bot.reply_to(message,  translated.text)
+
+        elif a == "pt":
+            bot.reply_to(message ,"🌍 Перевод на Португальский:")
+            bot.reply_to(message,  translated.text)
+
+        elif a == "it":
+            bot.reply_to(message ,"🌍 Перевод на Итальянский:")
+            bot.reply_to(message,  translated.text)
+        
+        else:
+            bot.reply_to(message ,"🌍 Перевод на Английский:")
+            bot.reply_to(message,  translated.text)
+
+    else:
+        bot.reply_to(message, "Вы еще не записали аудио! для записи /listen")
+
+
+@bot.message_handler(commands=['show'])
+def send_show(message):
+    if last_text:
+        bot.reply_to(message,  last_text)
+    else:
+        bot.reply_to(message, "Вы еще не записали аудио! для записи /listen")
+         
+
+@bot.message_handler(commands=['language'])
+def send_lang(message):
+    bot.reply_to(message, "/en --Английский /es --Испанский /pt --Португальский /it --Итальянский")
+
+
+@bot.message_handler(commands=['len'])
+def send_len(message):
+    bot.reply_to(message, "/10 /20 /30 /60")
+
+@bot.message_handler(commands=['10'])
+def send_10(message):
+    global a,b
+    b = 10
+    bot.reply_to(message, "Отлично, длина выбрана!")
+
+@bot.message_handler(commands=['20'])
+def send_20(message):
+    global a,b
+    b = 20
+    bot.reply_to(message, "Отлично, длина выбрана!")
+
+@bot.message_handler(commands=['30'])
+def send_30(message):
+    global a,b
+    b = 30
+    bot.reply_to(message, "Отлично, длина выбрана!")
+
+@bot.message_handler(commands=['60'])
+def send_30(message):
+    global a,b
+    b = 60
+    bot.reply_to(message, "Отлично, длина выбрана!")
+
+@bot.message_handler(commands=['en'])
+def send_en(message):
+    global a,b
+    a = "en"
+  
+    bot.reply_to(message, "Отлично, язык выбран!")
+
+
+@bot.message_handler(commands=['es'])
+def send_es(message):
+    global a,b
+    a = "es"
+  
+    bot.reply_to(message, "Отлично, язык выбран!")
+
+
+@bot.message_handler(commands=['pt'])
+def send_pt(message):
+    global a,b
+    a = "pt"
+   
+    bot.reply_to(message, "Отлично, язык выбран!")
+
+@bot.message_handler(commands=['it'])
+def send_it(message):
+    global a,b
+    a = "it"
+  
+    bot.reply_to(message, "Отлично, язык выбран!")
+
+
+bot.polling()
